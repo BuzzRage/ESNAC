@@ -1,4 +1,4 @@
-# WebTools
+# esnac-cli - Éco-système de Services Numérique Alternatifs Communs (ex WebTools)
 
 Ceci est un site personnel. Je compte m'en servir à but pédagogique pour me former,
 pour essayer des choses, pour construire mes propres outils etc...
@@ -36,7 +36,3 @@ pour essayer des choses, pour construire mes propres outils etc...
   - Tenter de calculer son [empreinte navigateur](https://www.comparitech.com/blog/vpn-privacy/what-is-browser-fingerprinting-how-to-protect-yourself/)
   - Etudier les infos intéressantes des cookies
 
-
-
-# ISSUES
-- No issues left

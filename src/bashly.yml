@@ -1,0 +1,58 @@
+name: esnac-cli
+help: Éco-système de Services Numérique Alternatifs Communs
+version: 0.1
+
+
+# Proporties for mandoc renderer.
+# Run `bashly render :mandoc --about` for more info.
+x_mandoc_authors: BuzzRage
+x_mandoc_footer: |-
+  # ISSUE TRACKER
+  Report issues at <https://github.com/BuzzRage/ESNAC/issues>
+
+args:
+- name: service
+  help: 'Le service avec lequel travailler'
+
+flags:
+- long: --delete
+  short: -d
+  arg: CONTAINER
+  help: 'Stop et supprime le conteneur Docker'
+
+- long: --help
+  short: -h
+  help: "Affiche l'aide utilisateur"
+
+- long: --name
+  short: -n
+  arg: NAME
+  needs: [--run]
+  help: "Assigne un nom au conteneur du service"
+
+- long: --run
+  short: -r
+  arg: CONTAINER
+  help: "Lance le conteneur"
+
+- long: --update
+  short: -u
+  arg: CONTAINER
+  help: "Redémarre le conteneur"
+
+- long: --verbose
+  short: -v
+  help: "Active le mode bavard (verbose)"
+
+examples:
+- esnac-cli -h
+
+environment_variables:
+- name: default_domain
+  help: Set the default domain to "portal.poc"
+  default: "portal.poc"
+
+- name: default_email
+  help: Set the default email to "admin@portal.poc"
+  default: "admin@portal.poc"
+

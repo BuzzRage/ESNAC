@@ -1,0 +1,52 @@
+services:
+    traefik:
+        image: traefik:latest
+        restart: unless-stopped
+        ports:
+            - 80:80
+            - 443:443
+            - 8080:8080
+        volumes:
+            - ./config:/etc/traefik
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./logs:/logs
+            - ./letsencrypt/acme.json:/acme.json
+            - ./letsencrypt/acme-staging.json:/acme-staging.json
+#  On a real server you may put config in /etc and logs in /var/log and so on ...
+#            - /opt/containers/traefik/logs:/logs
+#            - /opt/containers/traefik/traefik.yml:/traefik.yml
+#            - /opt/containers/traefik/letsencrypt/acme.json:/acme.json
+
+
+        networks:
+            - webservices
+        environment:
+            - TZ=Europe/Paris
+# Please fill with your credentials if OVH, otherwise replace with your host
+            - OVH_ENDPOINT=ovh-eu
+            - OVH_APPLICATION_KEY=
+            - OVH_APPLICATION_SECRET=
+            - OVH_CONSUMER_KEY=
+        labels:
+          - traefik.enable=true
+          - traefik.http.routers.traefik-dashboard.rule=Host(`monitor.portal.poc`)
+          - traefik.http.routers.traefik-dashboard.entrypoints=websecure
+          - traefik.http.routers.traefik-dashboard.service=api@internal
+          - traefik.http.routers.traefik-dashboard.tls=true
+          - traefik.http.routers.traefik-dashboard.tls.certresolver=letsencrypt
+
+        command:
+          - "--configFile=/etc/traefik/traefik.yml"
+          - "--api.insecure=true"
+          - "--providers.file.directory=/etc/traefik"
+          - "--providers.file.watch=true"
+          - "--providers.docker=true"
+          - "--entrypoints.web.address=:80"
+          - "--entrypoints.websecure.address=:443"
+          - "--entrypoints.web.http.redirections.entrypoints.to=websecure"
+          - "--entrypoints.web.http.redirections.entrypoints.scheme=https"
+
+networks:
+     webservices:
+         external: true
+

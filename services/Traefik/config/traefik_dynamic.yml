@@ -1,0 +1,6 @@
+[http.routers.api]
+  rule = "Host(`monitor.portal.poc`)"
+  entrypoints = ["websecure"]
+  service = "api@internal"
+  [http.routeurs.api.tls]
+    certResolver = "letsencrypt"

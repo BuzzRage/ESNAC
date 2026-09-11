@@ -1,0 +1,56 @@
+
+version: '3'
+services:
+  database:
+    image: postgres:9.6-alpine
+    environment:
+      - POSTGRES_USER=hedgedoc
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=hedgedoc
+    networks:
+      - HedgeDocInternal
+    volumes:
+      - database:/var/lib/postgresql/data
+    restart: always
+  app:
+    # Make sure to use the latest release from https://hedgedoc.org/latest-release
+    image: quay.io/hedgedoc/hedgedoc:1.8.2
+    environment:
+      - CMD_DB_URL=postgres://hedgedoc:password@database:5432/hedgedoc
+#      - CMD_DOMAIN=doc.portal.poc
+#      - CMD_PORT=8081
+      - CMD_URL_ADDPORT=false
+#      - CMD_USESSL=true
+      - CMD_PROTOCOL_USESSL=true
+#      - CMD_HSTS_ENABLE=true
+      - CMD_ALLOW_FREEURL=true
+      - CMD_EMAIL=true
+      - CMD_CMD_ALLOW_EMAIL_REGISTER=true
+    volumes:
+      - uploads:/hedgedoc/public/uploads
+    ports:
+      - "3000:3000"
+    restart: always
+    depends_on:
+      - database
+    networks:
+      - webservices
+      - HedgeDocInternal
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=webservices
+      - traefik.http.routers.hedgedoc.rule=Host(`doc.portal.poc`)
+      - traefik.http.routers.hedgedoc.entryPoints=websecure
+      - traefik.http.routers.hedgedoc.tls=true
+#      - traefik.http.routers.hedgedoc.tls.domains[0].main=doc.portal.poc
+#      - traefik.http.routers.hedgedoc.tls.domains[0].sans=doc.portal.poc
+      - traefik.http.routers.hedgedoc.tls.certresolver=letsencrypt-http # Don't know if necessary
+      - traefik.http.services.hedgedoc.loadbalancer.server.port=3000
+#      - traefik.http.services.hedgedoc.loadbalancer.server.port=80
+networks:
+   HedgeDocInternal:
+   webservices:
+     external: true
+volumes:
+  database:
+  uploads:
