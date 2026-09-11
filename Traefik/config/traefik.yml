@@ -1,0 +1,71 @@
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        certResolver: letsencrypt
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      # Pour la prod
+      caServer: 'https://acme-v02.api.letsencrypt.org/directory'
+      email: "admin@portal.poc"
+      storage: "acme.json"
+#      httpChallenge:
+#        entryPoint: "web"
+      dnsChallenge:
+        provider: ovh
+        propagation:
+          delayBeforeChecks: 30s
+  letsencrypt-staging:
+    acme:
+      # Pour les tests
+      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      email: "admin@portal.poc"
+      storage: "acme-staging.json"
+      dnsChallenge:
+        provider: ovh
+        propagation:
+          delayBeforeChecks: 30s
+  letsencrypt-http:
+    acme:
+      email: "admin@portal.poc"
+      caServer: 'https://acme-v02.api.letsencrypt.org/directory'
+      storage: "acme.json"
+      httpChallenge:
+        entryPoint: "web"
+
+
+serversTransport:
+   insecureSkipVerify: false # shoudl be true
+
+log:
+  level: DEBUG
+  filePath: /logs/traefik.log
+#  format: json
+
+accessLog:
+  filePath: /logs/access.log
+  format: json
+
+api:
+  insecure: true
+  dashboard: true
+
+providers:
+  docker:
+    endpoint: unix:///var/run/docker.sock
+#    defaultRule: Host(`{{ .Name }}.portal.poc`)
+    exposedByDefault: false
+    watch: true
+    network: "webservices"
+
