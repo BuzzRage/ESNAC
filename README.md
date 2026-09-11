@@ -1,4 +1,4 @@
-# WebTools
+# esnac-cli - Éco-système de Services Numérique Alternatifs Communs (ex WebTools)
 
 Ceci est un site personnel. Je compte m'en servir à but pédagogique pour me former,
 pour essayer des choses, pour construire mes propres outils etc...
