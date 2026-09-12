@@ -4,6 +4,16 @@ echo "# The code you write here will be wrapped by a function named 'root_comman
 echo "# Feel free to edit this file; your changes will persist when regenerating."
 inspect_args
 
+function set_domain(){
+  echo "Domain used : $DEFAULT_DOMAIN"
+  echo "email used : $DEFAULT_EMAIL"
+  cp /etc/hosts "/etc/hosts$(date +%Y-%m-%d).backup"
+  echo "127.0.0.2 $DEFAULT_DOMAIN" >> /etc/hosts
+}
+
+function reset_domain(){
+  sed -i "/$DEFAULT_DOMAIN/d" /etc/hosts
+}
 
 if [[ -n "${args['service']:-}" ]]; then
     declare -g service=${args['service']}
@@ -61,8 +71,6 @@ if [[ ${args[--verbose]} ]]; then
 else
     verbose=false
 fi
-
-log "$item $file $selected_key"
 
 if [[ ${args[--delete]} ]]; then
   delete "$CONTAINER_d"
