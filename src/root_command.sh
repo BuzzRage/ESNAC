@@ -1,12 +1,6 @@
-echo "# This file is located at 'src/root_command.sh'."
-echo "# It contains the implementation for the 'esnac-cli' command."
-echo "# The code you write here will be wrapped by a function named 'root_command()'."
-echo "# Feel free to edit this file; your changes will persist when regenerating."
 inspect_args
 
 #====== Variables ===========#
-
-declare -g SRC=$(pwd)/services/Website/Sources
 
 if [[ -n "${args['service']:-}" ]]; then
     declare -g service=${args['service']}
@@ -19,22 +13,22 @@ declare -g NAME=${args[--name]}
 declare -g CONTAINER_r=${args[--run]}
 declare -g CONTAINER_u=${args[--update]}
 
-# Laisser l'utilisateur choisir les variables d'environnements ( voir bashly ou .env )
-declare -g DOMAIN="$DEFAULT_DOMAIN"
-declare -g EMAIL="$DEFAULT_EMAIL"
-declare -g WEBSRC="$DEFAULT_WEBSRC"
+declare -g DOMAIN="$DOMAIN"
+declare -g EMAIL="$EMAIL"
+
+declare -g WEBSRC="$(pwd)/services/Website/Sources"
 
 
 function run(){
   show_env_config
-  delete services-traefik-1
-  delete services-webtools-1
+  docker compose -f services/docker-compose.yml down
+
   set_domain
   docker compose -f services/docker-compose.yml up -d
 }
 
 function delete(){
-  docker stop $1; docker rm $1;
+  docker rm -f "$1" || true
   reset_domain
 }
 
@@ -49,6 +43,8 @@ fi
 
 
 # Partie à revoir complètement
+# Une partie/commande globale ( docker-compose général)
+# Une partie/commande à l'échelle d'un conteneur
 
 if [[ ${args[--verbose]} ]]; then
     verbose=true
@@ -62,7 +58,7 @@ if [[ ${args[--delete]} ]]; then
 fi
 
 if [[ ${args[--help]} ]]; then
-    show_usage
+    esnac_cli_usage
     exit 0
 fi
 

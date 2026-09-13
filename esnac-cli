@@ -12,15 +12,9 @@ fi
 # :command.root_command
 root_command() {
   # src/root_command.sh
-  echo "# This file is located at 'src/root_command.sh'."
-  echo "# It contains the implementation for the 'esnac-cli' command."
-  echo "# The code you write here will be wrapped by a function named 'root_command()'."
-  echo "# Feel free to edit this file; your changes will persist when regenerating."
   inspect_args
 
   #====== Variables ===========#
-
-  declare -g SRC=$(pwd)/services/Website/Sources
 
   if [[ -n "${args['service']:-}" ]]; then
       declare -g service=${args['service']}
@@ -33,21 +27,21 @@ root_command() {
   declare -g CONTAINER_r=${args[--run]}
   declare -g CONTAINER_u=${args[--update]}
 
-  # Laisser l'utilisateur choisir les variables d'environnements ( voir bashly ou .env )
-  declare -g DOMAIN="$DEFAULT_DOMAIN"
-  declare -g EMAIL="$DEFAULT_EMAIL"
-  declare -g WEBSRC="$DEFAULT_WEBSRC"
+  declare -g DOMAIN="$DOMAIN"
+  declare -g EMAIL="$EMAIL"
+
+  declare -g WEBSRC="$(pwd)/services/Website/Sources"
 
   function run(){
     show_env_config
-    delete services-traefik-1
-    delete services-webtools-1
+    docker compose -f services/docker-compose.yml down
+
     set_domain
     docker compose -f services/docker-compose.yml up -d
   }
 
   function delete(){
-    docker stop $1; docker rm $1;
+    docker rm -f "$1" || true
     reset_domain
   }
 
@@ -61,6 +55,8 @@ root_command() {
   fi
 
   # Partie à revoir complètement
+  # Une partie/commande globale ( docker-compose général)
+  # Une partie/commande à l'échelle d'un conteneur
 
   if [[ ${args[--verbose]} ]]; then
       verbose=true
@@ -74,7 +70,7 @@ root_command() {
   fi
 
   if [[ ${args[--help]} ]]; then
-      show_usage
+      esnac_cli_usage
       exit 0
   fi
 
@@ -168,13 +164,13 @@ esnac_cli_usage() {
     printf "%s\n" "Environment Variables:"
 
     # :environment_variable.usage
-    printf "  %s\n" "DEFAULT_DOMAIN"
+    printf "  %s\n" "DOMAIN"
     printf "    Set the default domain to \"portal.poc\"\n"
     printf "    %s\n" "Default: portal.poc"
     echo
 
     # :environment_variable.usage
-    printf "  %s\n" "DEFAULT_EMAIL"
+    printf "  %s\n" "EMAIL"
     printf "    Set the default email to \"admin@portal.poc\"\n"
     printf "    %s\n" "Default: admin@portal.poc"
     echo
@@ -182,6 +178,7 @@ esnac_cli_usage() {
     # :command.usage_examples
     printf "%s\n" "Examples:"
     printf "  esnac-cli -h\n"
+    printf "  DOMAIN=chapeau.tu esnac-cli -r webtools\n"
     echo
 
   fi
@@ -259,9 +256,15 @@ inspect_args() {
 # Ce fichier se charge de gérer les fichiers de configurations
 
 function show_env_config(){
+  echo "Used environment variables (from .env.website): "
   echo "$(grep 'DOMAIN' .env.website)"
   echo "$(grep 'EMAIL' .env.website)"
   echo "$(grep 'WEBSRC' .env.website)"
+
+  echo "Used environment variables (from runtime): "
+  echo "DOMAIN=$DOMAIN"
+  echo "EMAIL=$EMAIL"
+  echo "WEBSRC=$WEBSRC"
 }
 
 function set_domain(){
@@ -303,11 +306,11 @@ parse_requirements() {
 
   # :command.environment_variables_filter
   # :command.environment_variables_default
-  export DEFAULT_DOMAIN="${DEFAULT_DOMAIN:-portal.poc}"
-  export DEFAULT_EMAIL="${DEFAULT_EMAIL:-admin@portal.poc}"
+  export DOMAIN="${DOMAIN:-portal.poc}"
+  export EMAIL="${EMAIL:-admin@portal.poc}"
 
-  env_var_names+=("DEFAULT_DOMAIN")
-  env_var_names+=("DEFAULT_EMAIL")
+  env_var_names+=("DOMAIN")
+  env_var_names+=("EMAIL")
 
   # :command.command_filter
   action="root"
@@ -425,8 +428,8 @@ initialize() {
   set -e
 
   # :command.environment_variables_default
-  export DEFAULT_DOMAIN="${DEFAULT_DOMAIN:-portal.poc}"
-  export DEFAULT_EMAIL="${DEFAULT_EMAIL:-admin@portal.poc}"
+  export DOMAIN="${DOMAIN:-portal.poc}"
+  export EMAIL="${EMAIL:-admin@portal.poc}"
 
 }
 
