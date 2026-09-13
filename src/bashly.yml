@@ -46,13 +46,14 @@ flags:
 
 examples:
 - esnac-cli -h
+- DOMAIN=chapeau.tu esnac-cli -r webtools
 
 environment_variables:
-- name: default_domain
+- name: DOMAIN
   help: Set the default domain to "portal.poc"
   default: "portal.poc"
 
-- name: default_email
+- name: EMAIL
   help: Set the default email to "admin@portal.poc"
   default: "admin@portal.poc"
 
