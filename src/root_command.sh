@@ -4,16 +4,9 @@ echo "# The code you write here will be wrapped by a function named 'root_comman
 echo "# Feel free to edit this file; your changes will persist when regenerating."
 inspect_args
 
-function set_domain(){
-  echo "Domain used : $DEFAULT_DOMAIN"
-  echo "email used : $DEFAULT_EMAIL"
-  cp /etc/hosts "/etc/hosts$(date +%Y-%m-%d).backup"
-  echo "127.0.0.2 $DEFAULT_DOMAIN" >> /etc/hosts
-}
+#====== Variables ===========#
 
-function reset_domain(){
-  sed -i "/$DEFAULT_DOMAIN/d" /etc/hosts
-}
+declare -g SRC=$(pwd)/services/Website/Sources
 
 if [[ -n "${args['service']:-}" ]]; then
     declare -g service=${args['service']}
@@ -26,45 +19,36 @@ declare -g NAME=${args[--name]}
 declare -g CONTAINER_r=${args[--run]}
 declare -g CONTAINER_u=${args[--update]}
 
-function show_usage(){
-  printf "Utilisation: $0 [options [paramètres]]\n"
-  printf "\n"
-  printf "\"WebTools\" est le nom par défaut.\n\n"
-  printf "Options:\n"
-  printf "  -r|--run                       : Lance le site web dans un conteneur Docker.\n"
-  printf "  -n|--name [nom du conteneur]   : Assigne un nom au conteneur.\n"
-  printf "  -u|--update [nom du conteneur] : Redémarre le conteneur pour actualiser les fichiers du site.\n"
-  printf "  -d|--delete [nom du conteneur] : Stop et supprime le conteneur Docker.\n"
-  printf "  -h|--help                      : Affiche le menu d'aide.\n"
+# Laisser l'utilisateur choisir les variables d'environnements ( voir bashly ou .env )
+declare -g DOMAIN="$DEFAULT_DOMAIN"
+declare -g EMAIL="$DEFAULT_EMAIL"
+declare -g WEBSRC="$DEFAULT_WEBSRC"
 
-  return 0
-}
 
 function run(){
-  if [ ! exist $1 ]; then
-    docker run --name $1 -d -p 8081:80 --mount type=bind,source="$SRC",target=/var/www/html php:apache
-  else
-    echo "$1 already exist"
-  fi
+  show_env_config
+  delete services-traefik-1
+  delete services-webtools-1
+  set_domain
+  docker compose -f services/docker-compose.yml up -d
 }
 
 function delete(){
   docker stop $1; docker rm $1;
+  reset_domain
 }
 
 function exist(){
   docker ps --format '{{.Names}}' | grep -q "$1" && return 0 || return 1
 }
 
-if !(systemctl -q is-active docker)
-  then
+if !(systemctl -q is-active docker); then
   echo "Veuillez démarrer le service Docker"
   exit 1
 fi
 
-SRC=$(pwd)/Sources
 
-
+# Partie à revoir complètement
 
 if [[ ${args[--verbose]} ]]; then
     verbose=true

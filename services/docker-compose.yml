@@ -1,0 +1,27 @@
+# docker‑compose.yml                                                          
+version: "3.9"
+
+services:
+  traefik:
+    image: traefik:v2.11
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"            # HTTP exposé              
+      - "8080:8080"        # Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  webtools:
+    image: php:apache
+    env_file:
+      - "../.env.website"
+    volumes:
+      - "${WEBSRC:-./Website/Sources/}:/var/www/html/"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.webtools.rule=Host(`${DOMAIN:-portal.poc}`)"
+      - "traefik.http.routers.webtools.entrypoints=web"
+      - "traefik.http.services.webtools.loadbalancer.server.port=80"
