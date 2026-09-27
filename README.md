@@ -4,6 +4,17 @@ Ce dépôt fourni un éco-système de services numériques alternatifs communs.
 
 C'est un brouillon, il est à but pédagogique pour s'auto-former.
 
+# Pré-requis
+
+## Obligatoire
+- docker
+
+## dev
+- bashly 
+
+# Préparation
+
+Copier le fichier d'exemple `.env.example` et renommer le `.env` en modifiant les variables d'environnements par les valeurs de votre choix.
 
 # Utilisation
   esnac-cli [SERVICE] [OPTIONS]
