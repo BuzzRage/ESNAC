@@ -3,21 +3,28 @@ version: "3.9"
 
 services:
   traefik:
-    image: traefik:v2.11
+    image: traefik:v3.7
     command:
-      - "--api.insecure=true"
+      - "--api.insecure=false"
+      - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
     ports:
-      - "80:80"            # HTTP exposé              
-      - "8080:8080"        # Dashboard
+      - "80:80"      # HTTP exposé (webtools)
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-
+    env_file:
+      - "../.env.run"
+    labels:
+    #Dashboard
+      - "traefik.enable=true"
+      - "traefik.http.routers.monitor.rule=Host(`monitor.${DOMAIN:-portal.poc}`)"
+      - "traefik.http.routers.monitor.entrypoints=web"
+      - "traefik.http.routers.monitor.service=api@internal"
   webtools:
     image: php:apache
     env_file:
-      - "../.env.website"
+      - "../.env.run"
     volumes:
       - "${WEBSRC:-./Website/Sources/}:/var/www/html/"
     labels:

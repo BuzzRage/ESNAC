@@ -1,5 +1,3 @@
-inspect_args
-
 #====== Variables ===========#
 
 if [[ -n "${args['service']:-}" ]]; then
@@ -8,22 +6,38 @@ else
     declare -g service="helloworld"
 fi
 
+declare -g verbose=false
+
 declare -g CONTAINER_d=${args[--delete]}
 declare -g NAME=${args[--name]}
 declare -g CONTAINER_r=${args[--run]}
 declare -g CONTAINER_u=${args[--update]}
 
-declare -g DOMAIN="$DOMAIN"
-declare -g EMAIL="$EMAIL"
+declare -g ENV_FILE="$ENV_FILE"
 
 declare -g WEBSRC="$(pwd)/services/Website/Sources"
 
 
+if [[ -f $ENV_FILE ]]; then
+    while IFS='=' read -r key value; do
+        # ignorer les lignes vides ou commentées
+        [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+
+        case "$key" in
+          DOMAIN) declare -g DOMAIN="$value" ;;
+          EMAIL)  declare -g EMAIL="$value"  ;;
+          WEBSRC) declare -g WEBSRC="$value" ;;
+        esac
+    done < $ENV_FILE
+fi
+
 function run(){
-  show_env_config
+  $verbose && show_env_config
+
   docker compose -f services/docker-compose.yml down
 
   set_domain
+
   docker compose -f services/docker-compose.yml up -d
 }
 

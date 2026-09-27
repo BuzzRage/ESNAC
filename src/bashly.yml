@@ -18,7 +18,7 @@ flags:
 - long: --delete
   short: -d
   arg: CONTAINER
-  help: 'Stop et supprime le conteneur Docker'
+  help: 'Stop et supprime le conteneur Docker $(yellow CONTAINER)'
 
 - long: --help
   short: -h
@@ -28,17 +28,17 @@ flags:
   short: -n
   arg: NAME
   needs: [--run]
-  help: "Assigne un nom au conteneur du service"
+  help: "Assigne le nom $(yellow NAME) au conteneur du service"
 
 - long: --run
   short: -r
   arg: CONTAINER
-  help: "Lance le conteneur"
+  help: "Lance le conteneur $(yellow CONTAINER)"
 
 - long: --update
   short: -u
   arg: CONTAINER
-  help: "Redémarre le conteneur"
+  help: "Redémarre le conteneur $(yellow CONTAINER)"
 
 - long: --verbose
   short: -v
@@ -49,6 +49,10 @@ examples:
 - DOMAIN=chapeau.tu esnac-cli -r webtools
 
 environment_variables:
+- name: ENV_FILE
+  help: Set the file containing environnement variables
+  default: ".env"
+
 - name: DOMAIN
   help: Set the default domain to "portal.poc"
   default: "portal.poc"

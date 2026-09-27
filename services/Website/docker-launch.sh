@@ -1,4 +1,5 @@
-#!/bin/bash
+## Ce fichier date d'avant bashly.
+## Il n'est plus utilisé.
 
 function show_usage(){
   printf "Utilisation: $0 [options [paramètres]]\n" 
