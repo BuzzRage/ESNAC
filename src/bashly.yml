@@ -49,6 +49,10 @@ examples:
 - DOMAIN=chapeau.tu esnac-cli -r webtools
 
 environment_variables:
+- name: ENV_FILE
+  help: Set the file containing environnement variables
+  default: ".env"
+
 - name: DOMAIN
   help: Set the default domain to "portal.poc"
   default: "portal.poc"

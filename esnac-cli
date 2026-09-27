@@ -12,8 +12,6 @@ fi
 # :command.root_command
 root_command() {
   # src/root_command.sh
-  inspect_args
-
   #====== Variables ===========#
 
   if [[ -n "${args['service']:-}" ]]; then
@@ -22,21 +20,37 @@ root_command() {
       declare -g service="helloworld"
   fi
 
+  declare -g verbose=false
+
   declare -g CONTAINER_d=${args[--delete]}
   declare -g NAME=${args[--name]}
   declare -g CONTAINER_r=${args[--run]}
   declare -g CONTAINER_u=${args[--update]}
 
-  declare -g DOMAIN="$DOMAIN"
-  declare -g EMAIL="$EMAIL"
+  declare -g ENV_FILE="$ENV_FILE"
 
   declare -g WEBSRC="$(pwd)/services/Website/Sources"
 
+  if [[ -f $ENV_FILE ]]; then
+      while IFS='=' read -r key value; do
+          # ignorer les lignes vides ou commentées
+          [[ -z "$key" || "$key" =~ ^[[:space:]]*# ]] && continue
+
+          case "$key" in
+            DOMAIN) declare -g DOMAIN="$value" ;;
+            EMAIL)  declare -g EMAIL="$value"  ;;
+            WEBSRC) declare -g WEBSRC="$value" ;;
+          esac
+      done < $ENV_FILE
+  fi
+
   function run(){
-    show_env_config
+    $verbose && show_env_config
+
     docker compose -f services/docker-compose.yml down
 
     set_domain
+
     docker compose -f services/docker-compose.yml up -d
   }
 
@@ -162,6 +176,12 @@ esnac_cli_usage() {
 
     # :command.usage_environment_variables
     printf "%s\n" "$(green_bold "Environment Variables:")"
+
+    # :environment_variable.usage
+    printf "  %s\n" "$(magenta "ENV_FILE")"
+    printf "    Set the file containing environnement variables\n"
+    printf "    %s\n" "Default: .env"
+    echo
 
     # :environment_variable.usage
     printf "  %s\n" "$(magenta "DOMAIN")"
@@ -304,19 +324,23 @@ white_underlined() { print_in_color "\e[4;37m" "$*"; }
 # Ce fichier se charge de gérer les fichiers de configurations
 
 function show_env_config(){
-  echo "Used environment variables (from .env.website): "
-  echo "$(grep 'DOMAIN' .env.website)"
-  echo "$(grep 'EMAIL' .env.website)"
-  echo "$(grep 'WEBSRC' .env.website)"
+  echo "$(yellow "Inspect_args output"): "
+  inspect_args
 
-  echo "Used environment variables (from runtime): "
+  echo "$(yellow "Used environment variables (from $ENV_FILE)"): "
+  echo "$(grep 'DOMAIN' $ENV_FILE)"
+  echo "$(grep 'EMAIL' $ENV_FILE)"
+  echo "$(grep 'WEBSRC' $ENV_FILE)"
+
+  echo "$(yellow "Used environment variables (from runtime)"): "
   echo "DOMAIN=$DOMAIN"
   echo "EMAIL=$EMAIL"
   echo "WEBSRC=$WEBSRC"
 }
 
 function set_domain(){
-  cp /etc/hosts "/etc/hosts-$(date +%Y-%m-%d).backup"
+  cp $ENV_FILE .env.run   # Copie du fichier utilisateur $ENV_FILE en un .env.run utilisable par les docker-compose.yml
+  cp /etc/hosts "./backups/hosts-$(date +%Y-%m-%d).backup"
   echo "127.0.0.2 $DOMAIN" >> /etc/hosts
 }
 
@@ -354,9 +378,11 @@ parse_requirements() {
 
   # :command.environment_variables_filter
   # :command.environment_variables_default
+  export ENV_FILE="${ENV_FILE:-.env}"
   export DOMAIN="${DOMAIN:-portal.poc}"
   export EMAIL="${EMAIL:-admin@portal.poc}"
 
+  env_var_names+=("ENV_FILE")
   env_var_names+=("DOMAIN")
   env_var_names+=("EMAIL")
 
@@ -476,6 +502,7 @@ initialize() {
   set -e
 
   # :command.environment_variables_default
+  export ENV_FILE="${ENV_FILE:-.env}"
   export DOMAIN="${DOMAIN:-portal.poc}"
   export EMAIL="${EMAIL:-admin@portal.poc}"
 
