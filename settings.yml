@@ -113,7 +113,7 @@ conjoined_flag_args: true
 
 # Show command examples (if any) whenever the user does not provide the
 # required arguments
-show_examples_on_error: false
+show_examples_on_error: true
 
 # When using private commands, flags, or environment variables, you may set 
 # this option to a name of an environment variable that, if set, will reveal
@@ -132,11 +132,11 @@ argfile_var: ARGFILE
 # You can run `bashly add colors` to add a standard colors library.
 # This option cannot be set via environment variables.
 usage_colors:
-  caption: ~
+  caption: green_bold
   command: ~
-  arg: ~
-  flag: ~
-  environment_variable: ~
+  arg: yellow
+  flag: red
+  environment_variable: magenta
 
 
 #-------------------------------------------------------------------------------
