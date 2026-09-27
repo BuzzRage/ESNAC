@@ -14,7 +14,8 @@ dev:
 
 # Préparation
 
-Copier le fichier d'exemple `.env.example` et renommer le `.env` en modifiant les variables d'environnements par les valeurs de votre choix.
+- Copier le fichier d'exemple `.env.example` et renommer le `.env` en modifiant les variables d'environnements par les valeurs de votre choix.
+- S'assurer qu'aucun service n'utilise déjà le port 80: `sudo lsof -i :80`. 
 
 # Utilisation
 
