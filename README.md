@@ -6,10 +6,10 @@ C'est un brouillon, il est à but pédagogique pour s'auto-former.
 
 # Pré-requis
 
-## Obligatoire
+Obligatoire:
 - docker
 
-## dev
+dev:
 - bashly 
 
 # Préparation
@@ -17,51 +17,5 @@ C'est un brouillon, il est à but pédagogique pour s'auto-former.
 Copier le fichier d'exemple `.env.example` et renommer le `.env` en modifiant les variables d'environnements par les valeurs de votre choix.
 
 # Utilisation
-  esnac-cli [SERVICE] [OPTIONS]
-  esnac-cli --help
-  esnac-cli --version
 
-#Options:
-  --delete, -d CONTAINER
-    Stop et supprime le conteneur Docker CONTAINER
-
-  --help, -h
-    Affiche l'aide utilisateur
-
-  --name, -n NAME
-    Assigne le nom NAME au conteneur du service
-    Needs: --run
-
-  --run, -r CONTAINER
-    Lance le conteneur CONTAINER
-
-  --update, -u CONTAINER
-    Redémarre le conteneur CONTAINER
-
-  --verbose, -v
-    Active le mode bavard (verbose)
-
-  --help
-    Show this help
-
-  --version
-    Show version number
-
-#Arguments:
-  SERVICE
-    Le service avec lequel travailler
-
-#Environment Variables:
-  DOMAIN
-    Set the default domain to "portal.poc"
-    Default: portal.poc
-
-  EMAIL
-    Set the default email to "admin@portal.poc"
-    Default: admin@portal.poc
-
-#Examples:
-  esnac-cli -h
-  DOMAIN=chapeau.tu esnac-cli -r webtools
-
-
+<img width="531" height="899" alt="image" src="https://github.com/user-attachments/assets/64966ca8-485d-4a3d-b947-43902b2d79e0" />
